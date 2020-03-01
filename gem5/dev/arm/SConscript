@@ -1,0 +1,5 @@
+# -*- mode:python -*-
+
+Import('*')
+SimObject('Dummy.py')
+Source('dummy.cc')
