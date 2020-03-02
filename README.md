@@ -1,7 +1,7 @@
-# gem5 DMA device behind SMMUv3 + Linux kernel module example
+# Minimal gem5 DMA Device + SMMUv3 + Linux kernel module
 
 Minimal gem5 device model and Linux kernel module for DMA operations behind
-gem5's SMMUv3 model. Tested on Ubuntu 19.10.
+gem5's SMMUv3 model. Tested on Ubuntu 18.04.
 
 ### Resources setup
 
@@ -33,8 +33,6 @@ make -C buildroot/ menuconfig
   * Linux Kernel -> Yes
     * Kernel configuration -> Use the architecture default configuration
     * Kernel binary format -> vmlinux
-* Toolchain
-  * Kernel Headers -> Same as kernel being built
 * Filesystem images
   * ext2/3/4 root filesystem -> Yes
   * tar the root filesystem -> No
@@ -46,12 +44,26 @@ make BR2_JLEVEL=$(nproc) -C buildroot/
 ### Setup Linux kernel module
 
 ```shell
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+     M=gem5-smmu-dma-example/linux/ \
+     INSTALL_MOD_PATH=buildroot/output/target/ \
+     -C buildroot/output/build/linux-5.4.22/ modules_install
+make BR2_JLEVEL=$(nproc) -C buildroot/
+ln -s -t resources/binaries/ buildroot/output/images/vmlinux
+ln -s -t resources/disks/ buildroot/output/images/rootfs.ext2
+```
+
+### Setup bootloader
+
+```shell
+make -C gem5/system/arm/bootloader/arm64
+ln -s -t resources/binaries/ gem5/system/arm/bootloader/arm64/boot_v2.arm64
 ```
 
 ### Run simulation
 
 ```shell
-export M5_PATH=${PWD}/resources/
+export M5_PATH=resources/
 gem5/build/ARM/gem5.opt gem5-smmu-dma-example/gem5/configs/main.py \
     --kernel vmlinux \
     --machine-type VExpress_GEM5_V2 \
