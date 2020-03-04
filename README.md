@@ -66,7 +66,7 @@ export M5_PATH=${PWD}/resources
 gem5/build/ARM/gem5.opt gem5-smmu-dma-example/gem5/configs/main.py \
     --kernel vmlinux \
     --root /dev/vda \
-    --machine-type VExpress_GEM5_V2 \
+    --machine-type DummyPlatform \
     --disk rootfs.ext2 \
     --cpu-type atomic
 ```
